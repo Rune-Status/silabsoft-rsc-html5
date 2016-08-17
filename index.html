@@ -442,7 +442,9 @@
 </div>
 
 <script src="three.min.js"></script>
-
+<script src="bzip2.js"></script>
+<script src="JagexTextureLoader.js"></script>
+<script src="ConfigLoader.js"></script>
 <script src="OB3Loader.js"></script>
 <script src="OrbitControls.js"></script>
 
@@ -453,10 +455,10 @@
     if (!Detector.webgl) Detector.addGetWebGLMessage();
 
     var container;
-
+    var config;
     var camera, scene, renderer, objects, controls;
     var model;
-
+    var textureLoader;
     var loader = new THREE.OB3Loader();
     var select = document.getElementById("modelList");
     loader.load('model/' + select.value, function (mod) {
@@ -483,7 +485,17 @@
         gridHelper.position.set(0, 10, 0);
         scene.add(gridHelper);
 
+        //game related crap
+        config = new THREE.ConfigLoader();
+        config.load('data_nobz/config85.jag',function(){
 
+        });
+    /*
+        textureLoader = new THREE.JagexTextureLoader();
+        textureLoader.load('data_nobz/textures17.jag',function(){
+
+        });
+        */
         renderer = new THREE.WebGLRenderer();
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);

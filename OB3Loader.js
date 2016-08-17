@@ -1,9 +1,10 @@
 (function () {
+
+
     THREE.OB3Loader = function (manager) {
 
         this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-        this.model = new THREE.Object3D();
 
     };
 
@@ -29,7 +30,7 @@
         },
 
         parse: function (data) {
-
+            var model = new THREE.Object3D();
             this._ptr = 0;
             this._data = new DataView(data);
 
@@ -104,7 +105,7 @@
                     colors.push(faceFillFront[i]);
                 }
             }
-            console.log(new Float32Array(colors));
+
             geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
             geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
             geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indexes), 1));
@@ -112,8 +113,8 @@
             var mesh = new THREE.Mesh(geometry);
 
 
-            this.model.add(mesh);
-            return this.model;
+            model.add(mesh);
+            return model;
 
         },
 
@@ -134,7 +135,7 @@
             }
         },
         readU8: function () {
-            var a = this._data.getUint8(this._ptr, false);
+            var a = this._data.getUint8(this._ptr);
             this._ptr += 1;
             return a;
         },
