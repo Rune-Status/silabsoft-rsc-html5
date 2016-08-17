@@ -108,7 +108,7 @@
             geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
             geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
             geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indexes), 1));
-
+            geometry.computeFaceNormals();
             var mesh = new THREE.Mesh(geometry);
 
 
