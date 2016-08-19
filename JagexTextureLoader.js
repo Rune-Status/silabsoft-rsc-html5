@@ -46,7 +46,7 @@
                 this._data = new DataView(data);
             }
             else{
-
+                this._ptr = 0;
                 this._data = new DataView(this._data.buffer.slice(6));
             }
             return this.parseTexture();
@@ -58,7 +58,7 @@
 
         },
         unpackData : function(filename){
-            var numEntries = (this.read8() & 0xff) * 256 + (this.read8() & 0xff);
+            var numEntries = (this.peek8() & 0xff) * 256 + (this.peek8() & 0xff);
             var wantedHash = 0;
 
             filename = filename.toUpperCase();
@@ -78,11 +78,11 @@
 
                     if (fileSize != fileSizeCompressed) {
 
-                        /*
+
                          var out = [];
                          BZLib.decompress(out, fileSize, Array.prototype.slice.call(new Int8Array(this._data.buffer)), fileSizeCompressed, offset);
                          return {data: new DataView(out), size: fileSize, offset: 0};
-                         */
+
                         return null;
                     } else {
 

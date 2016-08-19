@@ -486,9 +486,13 @@
         scene.add(gridHelper);
 
         //game related crap
-        config = new THREE.ConfigLoader();
-        config.load('data_nobz/config85.jag',function(){
-
+        /*
+         config = new THREE.ConfigLoader();
+        config.load('data_nobz/config85.jag',function(conf){
+            this.config = conf;
+            for (var i = 0; i < config.npcCount; i++){
+                console.log(config.npcName[i]);
+            }
         });
     /*
         textureLoader = new THREE.JagexTextureLoader();
