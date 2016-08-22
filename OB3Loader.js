@@ -46,21 +46,21 @@
             var faceIntensity = [];
             var faceNumVertices = [];
             var indexes = [];
-            var colors = [];
+            var colors =[];
             for (var i = 0; i < vertexCount * 3; i++) {
                 vertex.push(parseFloat(this.readS16()));
 
             }
             for (var i = 0; i < vertexCount; i++) {
-                vertices.push(vertex[i], vertex[vertexCount + i], vertex[(vertexCount * 2) + i]);
+                vertices.push(vertex[i],-vertex[vertexCount + i],-vertex[(vertexCount * 2) + i]);
             }
 
             for (var i = 0; i < faceCount; i++) {
                 faceNumVertices.push(this.readU8());
             }
-
+            var cOff = 0;
             for (var i = 0; i < faceCount; i++) {
-                var c = this.getTextureOrColor(this.readS16());
+                var c = this.readS16();
 
                 faceFillFront.push(c);
                 /*     if (faceFillFront[l1] == 32767) {
@@ -90,27 +90,41 @@
                 for (var x = 0; x < faceNumVertices[i]; x++) {
                     if (vertexCount < 256) {
 
-                        face[x] = this.readU8();
+                        face[x] = this.readU8()  & 0xff;
                     } else {
 
                         face[x] = this.readU16();
                     }
                 }
-                //convert to triangles
-                for (var fc = 0; fc < (faceNumVertices[i] / 4); fc++) {
-                    indexes.push(face[0 + (fc * 4)], face[1 + (fc * 4)], face[2 + (fc * 4)]);
 
-                    colors.push(faceFillFront[i]);
-                    indexes.push(face[2 + (fc * 4)], face[3 + (fc * 4)], face[0 + (fc * 4)]);
-                    colors.push(faceFillFront[i]);
+                //convert to triangles
+
+                for (var fc = 0; fc <= (faceNumVertices[i] / 3); fc++) {
+                    indexes.push(face[0 ], face[1 + fc ], face[2 + fc ]);
+                    var c = this.getTextureOrColor(faceFillFront[i]);
+               /*     if(c instanceof Array){
+
+                        colors.push(c[0]);
+                        colors.push(c[1]);
+                        colors.push(c[2]);
+
+                    }
+
+                    colors.push(255);
+                    colors.push(0);
+                    colors.push(255);
+                    */
                 }
+
             }
 
             geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
-            geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+
+            geometry.addAttribute( 'color', new THREE.BufferAttribute(new Float32Array( colors), 3 ) );
             geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indexes), 1));
             geometry.computeFaceNormals();
-            var mesh = new THREE.Mesh(geometry);
+            var material = new THREE.MeshBasicMaterial( new THREE.MeshBasicMaterial( { color: 0xffffff,wireframe : true} ) );
+            var mesh = new THREE.Mesh(geometry,material);
 
 
             model.add(mesh);
@@ -129,13 +143,14 @@
                 var j = i >> 10 & 0x1f;
                 var k = i >> 5 & 0x1f;
                 var l = i & 0x1f;
-                return (j << 19) + (k << 11) + (l << 3);
+
+                return [j,k,l];
             } else {
                 return 0xffff00; //returning aliceblue to indicate we need a texture.
             }
         },
         readU8: function () {
-            var a = this._data.getUint8(this._ptr);
+            var a = this._data.getInt8(this._ptr);
             this._ptr += 1;
             return a;
         },

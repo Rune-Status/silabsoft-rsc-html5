@@ -463,11 +463,12 @@
     var select = document.getElementById("modelList");
     loader.load('model/' + select.value, function (mod) {
         init();
+        render();
         model = mod;
         scene.add(model);
 
     });
-    render();
+
 
 
     function init() {
@@ -485,15 +486,6 @@
         gridHelper.position.set(0, 10, 0);
         scene.add(gridHelper);
 
-        //game related crap
-        /*
-         config = new THREE.ConfigLoader();
-        config.load('data_nobz/config85.jag',function(conf){
-            this.config = conf;
-            for (var i = 0; i < config.npcCount; i++){
-                console.log(config.npcName[i]);
-            }
-        });
     /*
         textureLoader = new THREE.JagexTextureLoader();
         textureLoader.load('data_nobz/textures17.jag',function(){
@@ -501,8 +493,10 @@
         });
         */
         renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+
+
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild(renderer.domElement);
 
 
@@ -538,7 +532,7 @@
     function render() {
 
         requestAnimationFrame(render);
-        renderer.render(scene, camera);
+     renderer.render(scene, camera);
 
 
     }
