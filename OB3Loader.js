@@ -52,6 +52,7 @@
 
             }
             for (var i = 0; i < vertexCount; i++) {
+
                 vertices.push(vertex[i],-vertex[vertexCount + i],-vertex[(vertexCount * 2) + i]);
             }
 
@@ -100,7 +101,7 @@
                 //convert to triangles
 
                 for (var fc = 0; fc <= (faceNumVertices[i] / 3); fc++) {
-                    indexes.push(face[0 ], face[1 + fc ], face[2 + fc ]);
+                    indexes.push(face[fc  ], face[ fc+1 ], face[ fc+2 ]);
                     var c = this.getTextureOrColor(faceFillFront[i]);
                /*     if(c instanceof Array){
 

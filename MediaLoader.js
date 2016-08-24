@@ -4,19 +4,15 @@
 (function () {
 
 
-    THREE.JagexTextureLoader = function (manager, config, spriteData) {
-
+    THREE.MediaLoader = function (manager, config, spriteData) {
         this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-        this.config = THREE.ConfigLoader;
-        this.rawSpriteCache = spriteData;
         this.surface = spriteData;
         this.config = config;
-        this.textures = [];
     };
 
-    THREE.JagexTextureLoader.prototype = {
+    THREE.MediaLoader.prototype = {
 
-        constructor: THREE.JagexTextureLoader,
+        constructor: THREE.MediaLoader,
 
         load: function (url, onLoad, onProgress, onError) {
             var scope = this;
@@ -53,70 +49,52 @@
                 this._data = new DataView(this._data.buffer.slice(6));
                 this._ptr = 0;
             }
-            return this.parseTextures();
+            return this.parseMedia();
         },
-        parseTextures: function () {
+        parseMedia: function () {
+            var buff = this.unpackData("index.dat");
+            surface.parseSprite(surface.spriteMedia,this.unpackData("inv1.dat"), buff, 1);
+            surface.parseSprite(surface.spriteMedia + 1, this.unpackData("inv2.dat"), buff, 6);
+            surface.parseSprite(surface.spriteMedia + 9, this.unpackData("bubble.dat"), buff, 1);
+            surface.parseSprite(surface.spriteMedia + 10, this.unpackData("runescape.dat"), buff, 1);
+            surface.parseSprite(surface.spriteMedia + 11, this.unpackData("splat.dat"), buff, 3);
+            surface.parseSprite(surface.spriteMedia + 14,this.unpackData("icon.dat"), buff, 8);
+            surface.parseSprite(surface.spriteMedia + 22,this.unpackData("hbar.dat"), buff, 1);
+            surface.parseSprite(surface.spriteMedia + 23, this.unpackData("hbar2.dat"), buff, 1);
+            surface.parseSprite(surface.spriteMedia + 24, this.unpackData("compass.dat"), buff, 1);
+            surface.parseSprite(surface.spriteMedia + 25, this.unpackData("buttons.dat"), buff, 2);
+            surface.parseSprite(surface.spriteUtil,this.unpackData("scrollbar.dat"), buff, 2);
+            surface.parseSprite(surface.spriteUtil + 2, this.unpackData("corners.dat"), buff, 4);
+            surface.parseSprite(surface.spriteUtil + 6, this.unpackData("arrows.dat"), buff, 2);
+            surface.parseSprite(surface.spriteProjectile, this.unpackData("projectile.dat"), buff, this.config.projectileSprite);
 
-            var index = this.unpackData("index.dat");
-
-            var textures = this.allocateTextures(this.config.textureCount, 7, 11);
-
-            for (var i = 0; i < this.config.textureCount; i++) {
-                var name = config.textureName[i];
-                var buff1 = this.unpackData(name + ".dat");
-                this.surface.setBounds(0,0,128,128)
-                this.surface.drawBox(0, 0, 128, 128, 0xff00ff);
-                this.surface.parseSprite(this.rawSpriteCache.spriteTexture, buff1, index, 1);
-                this.surface.drawSprite(0, 0, this.rawSpriteCache.spriteTexture);
-
-                var wh = this.rawSpriteCache.spriteWidthFull[this.rawSpriteCache.spriteTexture];
-                var nameSub = config.textureSubtypeName[i];
-                if (nameSub != undefined && nameSub.length > 0) {
-                    var buff2 = this.unpackData(nameSub + ".dat");
-                    this.surface.parseSprite(this.rawSpriteCache.spriteTexture, buff2, index, 1);
-                    this.surface.drawSprite(0, 0, this.rawSpriteCache.spriteTexture);
+            var i = config.itemSpriteCount;
+            for (var j = 1; i > 0; j++) {
+                var k = i;
+                i -= 30;
+                if (k > 30) {
+                    k = 30;
                 }
-                this.surface.fillSpritePixelsFromDrawingArea( this.rawSpriteCache.spriteTextureWorld + i, 0, 0, wh, wh);
-                this.textures.push(  this.surface.getCanvas());
-
+                surface.parseSprite(surface.spriteItem + (j - 1) * 30,  this.unpackData("objects" + j + ".dat"), buff, k);
             }
 
-
-
-
-
-
-
-
-
-            return this.textures;
-        },
-        toColor: function (num) {
-            if(num == undefined){
-                num = 0;
+            surface.loadSprite(surface.spriteMedia);
+            surface.loadSprite(surface.spriteMedia + 9);
+            for (var l = 11; l <= 26; l++) {
+                surface.loadSprite(surface.spriteMedia + l);
             }
-            var b = num & 0xFF,
-                g = (num & 0xFF00) >>> 8,
-                r = (num & 0xFF0000) >>> 16;
 
-            return [r, g, b];
-        },
-
-        allocateTextures: function (count, something7, something11) {
-            var textures;
-            return textures = {
-                textureCount: count,
-                textureColoursUsed: this.createArray(count, 0),
-                textureColourList: this.createArray(count, 0),
-                textureDimension: [count],
-                textureLoadedNumber: [count],
-                textureBackTransparent: [count],
-                texturePixels: this.createArray(count, 0),
-                textureCountLoaded: 0,
-                textureColours64: this.createArray(count, 0),// 64x64 rgba
-                textureColours128: this.createArray(count, 0),// 128x128 rgba
+            for (var i1 = 0; i1 < config.projectileSprite; i1++) {
+                surface.loadSprite(surface.spriteProjectile + i1);
             }
+
+            for (var j1 = 0; j1 < config.itemSpriteCount; j1++) {
+                surface.loadSprite(surface.spriteItem + j1);
+            }
+
+            return surface;
         },
+
         createArray: function (length) {
             var arr = new Array(length || 0),
                 i = length;

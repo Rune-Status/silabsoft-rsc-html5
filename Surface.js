@@ -95,10 +95,30 @@
                 this.drawSpriteFillPixels(this.pixels, this.spriteColoursUsed[id], this.spriteColourList[id], rX, rY, width, height, w2, h2, 1);
                 return;
             } else {
-                drawSprite(this.pixels, this.spritePixels[id], 0, rX, rY, width, height, w2, h2, 1);
+                this.drawSpriteNow(this.pixels, this.spritePixels[id], 0, rX, rY, width, height, w2, h2, 1);
                 return;
             }
         },
+        loadSprite : function(spriteId) {
+        if (this.spriteColoursUsed[spriteId] == null)
+            return;
+        var size = this.spriteWidth[spriteId] * this.spriteHeight[spriteId];
+        var idx = this.spriteColoursUsed[spriteId];
+        var cols = this.spriteColourList[spriteId];
+        var pixels = [size];
+        for (var pixel = 0; pixel < size; pixel++) {
+            var colour = cols[idx[pixel] & 0xff];
+            if (colour == 0)
+                colour = 1;
+            else if (colour == 0xff00ff)
+                colour = 0;
+            pixels[pixel] = colour;
+        }
+
+       this. spritePixels[spriteId] = pixels;
+        this.spriteColoursUsed[spriteId] = null;
+       this. spriteColourList[spriteId] = null;
+    },
         fillSpritePixelsFromDrawingArea: function (sprite, x, y, width, height) {// used from mudclient
             this.spriteWidth[sprite] = width;
             this.spriteHeight[sprite] = height;
@@ -231,6 +251,74 @@
 
 
             return canvas;
+        },
+        parseSprite(spriteId, spriteData, indexData, frameCount) {
+
+            var indexOff = this.getUnsignedShort(spriteData, 0);
+
+            var fullWidth = this.getUnsignedShort(indexData, indexOff);
+            indexOff += 2;
+            var fullHeight = this.getUnsignedShort(indexData, indexOff);
+            indexOff += 2;
+            var colourCount = this.getSignedByte(indexData, indexOff++) & 0xff;
+            var colours = [colourCount];
+            colours[0] = 0xff00ff;
+            for (var i = 0; i < colourCount - 1; i++) {
+                colours[i + 1] = ((this.getSignedByte(indexData, indexOff) & 0xff) << 16) + ((this.getSignedByte(indexData, indexOff + 1) & 0xff) << 8) + (this.getSignedByte(indexData, indexOff + 2) & 0xff);
+                indexOff += 3;
+            }
+
+            var spriteOff = 2;
+
+            for (var id = spriteId; id < spriteId + frameCount; id++) {
+
+              this.spriteTranslateX[id] = this.getSignedByte(indexData, indexOff++) & 0xff;
+              this.spriteTranslateY[id] = this.getSignedByte(indexData, indexOff++) & 0xff;
+              this.spriteWidth[id] = this.getUnsignedShort(indexData, indexOff);
+                indexOff += 2;
+              this.spriteHeight[id] = this.getUnsignedShort(indexData, indexOff);
+                indexOff += 2;
+                var unknown = this.getSignedByte(indexData, indexOff++) & 0xff;
+                var size = this.spriteWidth[id] * this.spriteHeight[id];
+              this.spriteColoursUsed[id] = [size];
+              this.spriteColourList[id] = colours;
+
+              this.spriteWidthFull[id] = fullWidth;
+              this.spriteHeightFull[id] = fullHeight;
+              this.spritePixels[id] = null;
+              this.spriteTranslate[id] = false;
+                if (this.spriteTranslateX[id] != 0 || this.spriteTranslateY[id] != 0)
+                  this.spriteTranslate[id] = true;
+                if (unknown == 0) {
+                    for (var pixel = 0; pixel < size; pixel++) {
+                      this.spriteColoursUsed[id][pixel] = this.getSignedByte(spriteData, spriteOff++);
+                        if (this.spriteColoursUsed[id][pixel] == 0)
+                          this.spriteTranslate[id] = true;
+                    }
+
+                } else if (unknown == 1) {
+                    for (var x = 0; x < this.spriteWidth[id]; x++) {
+                        for (var y = 0; y < this.spriteHeight[id]; y++) {
+                          this.spriteColoursUsed[id][x + y * this.spriteWidth[id]] = this.getSignedByte(spriteData, spriteOff++);
+                            if (this.spriteColoursUsed[id][x + y * this.spriteWidth[id]] == 0)
+                              this.spriteTranslate[id] = true;
+                        }
+
+                    }
+
+                }
+            }
+
+        },
+        getSignedByte: function (data, offset) {
+
+            var i = data.getInt8(offset);
+            return i;
+        },
+        getUnsignedShort: function (data, offset) {
+
+            var i = data.getUint16(offset);
+            return i;
         },
         toColor: function (num) {
             if (num == undefined) {
