@@ -38,7 +38,10 @@
             this.pixels = [w * h];
             this.width = w;
             this.height = h;
-
+            this.boundsBottomY = h;
+            this. boundsBottomX = w;
+            this.width1 =  this.width2 = w;
+            this. height1 =  this.height2 = h;
 
         },
         drawBox: function (x, y, w, h, colour) {
@@ -55,17 +58,44 @@
                 x += this.spriteTranslateX[id];
                 y += this.spriteTranslateY[id];
             }
-            var rY = x + y * this.width;
+            var rY = x + y * this.width2;
             var rX = 0;
             var height = this.spriteHeight[id];
             var width = this.spriteWidth[id];
-            var w2 = 0;
+            var w2 = this.width2 - width;
             var h2 = 0;
+            if (y < this.boundsTopY) {
+                var j2 = this.boundsTopY - y;
+                height -= j2;
+                y = this.boundsTopY;
+                rX += j2 * width;
+                rY += j2 * this.width2;
+            }
+            if (y + height >= this.boundsBottomY)
+                height -= ((y + height) - this.boundsBottomY) + 1;
+            if (x < this.boundsTopX) {
+                var k2 =this. boundsTopX - x;
+                width -= k2;
+                x = this.boundsTopX;
+                rX += k2;
+                rY += k2;
+                h2 += k2;
+                w2 += k2;
+            }
+            if (x + width >= this.boundsBottomX) {
+                var l2 = ((x + width) - this.boundsBottomX) + 1;
+                width -= l2;
+                h2 += l2;
+                w2 += l2;
+            }
+            if (width <= 0 || height <= 0)
+                return;
+
             if (this.spritePixels[id] == null) {
-                this.drawSpriteFillPixels(this.pixels, this.spriteColoursUsed[id], this.spriteColourList[id], 0, 0, this.width, this.height, w2, h2, 1);
+                this.drawSpriteFillPixels(this.pixels, this.spriteColoursUsed[id], this.spriteColourList[id], rX, rY, width, height, w2, h2, 1);
                 return;
             } else {
-                this.drawSpriteNow(this.pixels, this.spritePixels[id], 0, rX, rY, this.width, this.height, w2, h2, 1);
+                drawSprite(this.pixels, this.spritePixels[id], 0, rX, rY, width, height, w2, h2, 1);
                 return;
             }
         },
