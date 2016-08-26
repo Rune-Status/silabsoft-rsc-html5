@@ -9,6 +9,8 @@
 
 <script src="three.min.js"></script>
 <script src="bzip2.js"></script>
+<script src="rsc.js"></script>
+<script src="JagUnpack.js"></script>
 <script src="Surface.js"></script>
 <script src="ConfigLoader.js"></script>
 <script src="JagexTextureLoader.js"></script>
@@ -20,12 +22,12 @@
     init();
 
     function init() {
-        config = new THREE.ConfigLoader();
-        spriteData = new THREE.Surface();
+        config = new RSC.ConfigLoader();
+        spriteData = new RSC.Surface();
         config.load('data_nobz/config85.jag',function(conf) {
             this.config = conf;
 
-          textures = new THREE.JagexTextureLoader(undefined,config,spriteData);
+          textures = new RSC.JagexTextureLoader(undefined,config,spriteData);
 
             textures.load('data_nobz/textures17.jag',function(tex) {
                 this.textures = tex;

@@ -1,7 +1,7 @@
 (function () {
 
 
-    THREE.Surface = function () {
+    RSC.Surface = function () {
         var limit = 40000;
 
         this.spritePixels = [limit];
@@ -31,9 +31,9 @@
         //}
     };
 
-    THREE.Surface.prototype = {
+    RSC.Surface.prototype = {
 
-        constructor: THREE.Surface,
+        constructor: RSC.Surface,
         setBounds: function (x, y, w, h) {
             this.pixels = [w * h];
             this.width = w;

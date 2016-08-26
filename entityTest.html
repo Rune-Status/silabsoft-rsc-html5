@@ -12,7 +12,7 @@
 <script src="rsc.js"></script>
 <script src="JagUnpack.js"></script>
 <script src="Surface.js"></script>
-<script src="MediaLoader.js"></script>
+<script src="EntityLoader.js"></script>
 <script src="ConfigLoader.js"></script>
 <script>
 
@@ -27,18 +27,18 @@
         config.load('data_nobz/config85.jag',function(conf) {
             this.config = conf;
 
-            var mediaLoader = new RSC.MediaLoader(undefined,config,surface);
-            mediaLoader.load('data_nobz/media58.jag',function(tex) {
+            var entityLoader = new RSC.EntityLoader(undefined,config,surface);
+            entityLoader.load('data_nobz/entity24.jag','data_nobz/entity24.mem',function(tex) {
 
                 var element = document.getElementById('treeview');
-              for(var i = 0; i < 40000; i++){
-                  if(surface.spriteWidth[i] != 40000 && surface.spriteWidth[i] != undefined){
-                      this.surface.setBounds(0,0,surface.spriteWidthFull[i],surface.spriteHeightFull[i]);
+                for(var i = 0; i < 40000; i++){
+                    if(surface.spriteWidth[i] != 40000 && surface.spriteWidth[i] != undefined){
+                        this.surface.setBounds(0,0,surface.spriteWidthFull[i],surface.spriteHeightFull[i]);
 
-                      this.surface.drawSprite(0, 0, i);
-                      element.appendChild(this.surface.getCanvas());
-                  }
-              }
+                        this.surface.drawSprite(0, 0, i);
+                        element.appendChild(this.surface.getCanvas());
+                    }
+                }
             });
         });
     }
